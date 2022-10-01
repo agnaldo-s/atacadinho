@@ -2,10 +2,9 @@ import os
 import sqlite3
 import database
 from time import sleep
-from sqlite3 import Error
-
 
 conexao_banco = sqlite3.connect('atacadinho.db')
+conexao_banco.execute('PRAGMA foreign_keys=on')
 cursor = conexao_banco.cursor()
 
 
