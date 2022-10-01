@@ -1,13 +1,14 @@
 def validarLogin():
-  ##Agnaldo validar login
+    ##Agnaldo validar login
+    pass
 
-#menuInicial = ChamarMenu()
-#menuInicial = 1
+
+menuInicial = 1
 
 if menuInicial == 1:
-  usuario = input(str("Inserir Usuário:\n"))
-  senha = input(int("Inserir Usuário:\n"))
+    usuario = input(str("Inserir Usuário:\n"))
+    senha = input(int("Inserir Usuário:\n"))
 
-  #Validar login
- # if #coluna perfil = "001": ENTRAR NO MENU ADMIN
- # elif #Coluna perfil = "002" ENTRAR NO MENU FUNCIONÁRIO
+    # Validar login
+# if #coluna perfil = "001": ENTRAR NO MENU ADMIN
+# elif #Coluna perfil = "002" ENTRAR NO MENU FUNCIONÁRIO
