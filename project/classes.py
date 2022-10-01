@@ -97,6 +97,9 @@ class Venda(Movimentacao):
     def consultar_produto(self):
         pass
 
+    def gerar_nota_fiscal(self):
+        pass
+
 
 class Estoque(Movimentacao):
     def deletar_produto(self):
