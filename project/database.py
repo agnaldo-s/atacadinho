@@ -8,27 +8,26 @@ def tabelas(conn, conn_cursor):
             telefone VARCHAR(13) NOT NULL,
             email VARCHAR(60) NOT NULL
         );
-        
+
+        CREATE TABLE IF NOT EXISTS tiposFuncionarios(
+            id_tipoFunc INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            descricao VARCHAR(70) NOT NULL                        
+        );
+
         CREATE TABLE IF NOT EXISTS funcionarios(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             matricula VARCHAR(6) NOT NULL,
             dt_cadastro DATE NOT NULL,
             pessoa_id INTEGER NOT NULL,
+            tipoFunc_id INTERGER NOT NULL,
+            CONSTRAINT fk_funcionario_tipoFuncionarios
+                FOREIGN KEY(tipoFunc_id)
+                REFERENCES tiposFuncionarios(id_tipoFunc),
             CONSTRAINT fk_funcionario_pessoa
                 FOREIGN KEY(pessoa_id)
                 REFERENCES pessoas(id)
                 ON UPDATE CASCADE
                 ON DELETE CASCADE
-        );
-        
-        CREATE TABLE IF NOT EXISTS administradores(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            matricula VARCHAR(6) NOT NULL,
-            dt_cadastro DATE NOT NULL,
-            pessoa_id INTEGER NOT NULL,
-            CONSTRAINT fk_administrador_pessoa
-                FOREIGN KEY(pessoa_id)
-                REFERENCES pessoas(id)
         );
         
         CREATE TABLE IF NOT EXISTS logins(
@@ -72,32 +71,29 @@ def tabelas(conn, conn_cursor):
                 ON UPDATE CASCADE
                 ON DELETE CASCADE
         );
-        
+    
+        CREATE TABLE IF NOT EXISTS regitro_movimentacao(
+            id_regMovitacao INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS estoque(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             produto_id INTEGER NOT NULL,
             quantidade INTEGER NOT NULL,
+            id_regMovitacao INTEGER NOT NULL,
+            data_hora DATETIME default current_timestamp,
+            id_funcionario INTERGER NOT NULL,
+            CONSTRAINT fk_estoque_registro_movimentacao
+                FOREIGN KEY(id_regMovitacao)
+                REFERENCES regitro_movimentacao(id_regMovitacao),
+            CONSTRAINT fk_estoque_funcionarios
+                FOREIGN KEY(id_funcionario)
+                REFERENCES funcionarios(id)
             CONSTRAINT fk_estoque_produtos
                 FOREIGN KEY(produto_id)
                 REFERENCES produtos(id)
         );
+
+
+
     """
-
-    with conn:
-        conn_cursor.executescript(ddl)
-
-
-def validar_login(conn, conn_cursor, username, senha):
-    login = [username, senha]
-
-    dql = """
-        SELECT * FROM logins
-        WHERE nome_usuario = ? AND senha = ?;
-    """
-
-    with conn:
-        conn_cursor.execute(dql, login)
-
-        dados_login = conn_cursor.fetchone()
-
-    print(dados_login)
