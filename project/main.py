@@ -52,6 +52,13 @@ def login(conn, conn_cursor, person):
 
     tipo_usuario = person.fazer_login(conn, conn_cursor, nome_usuario, senha)
 
+    if tipo_usuario is None:
+        print('\nNome de usuário ou senha incorretos, informe novamente')
+    elif tipo_usuario[2] == 'Administrador':
+        pass
+    elif tipo_usuario[1] == 'Funcionario':
+        pass
+
     sleep(999)
 
 
