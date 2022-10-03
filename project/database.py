@@ -22,7 +22,9 @@ def tabelas(conn, conn_cursor):
             tipoFunc_id INTERGER NOT NULL,
             CONSTRAINT fk_funcionario_tipoFuncionarios
                 FOREIGN KEY(tipoFunc_id)
-                REFERENCES tiposFuncionarios(id_tipoFunc),
+                REFERENCES tiposFuncionarios(id_tipoFunc)
+                ON UPDATE CASCADE
+                ON DELETE CASCADE,
             CONSTRAINT fk_funcionario_pessoa
                 FOREIGN KEY(pessoa_id)
                 REFERENCES pessoas(id)

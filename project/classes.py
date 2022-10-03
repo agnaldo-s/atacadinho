@@ -1,13 +1,15 @@
-from abc import ABC, abstractmethod
+import sqlite3
+import database
+from abc import abstractmethod, ABC
 
 
-class Pessoa(ABC):
-    @abstractmethod
-    def fazer_login(self, username, senha):
-        pass
+class Pessoa:
+    @staticmethod
+    def fazer_login(conn, conn_cursor, username, senha):
+        database.validar_login(conn, conn_cursor, username, senha)
 
-    @abstractmethod
-    def sair_conta(self):
+    @staticmethod
+    def sair_conta():
         pass
 
 
