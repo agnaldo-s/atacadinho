@@ -50,7 +50,7 @@ def login(conn, conn_cursor, person):
 
     senha = input('\nSenha: ')
 
-    tipo_usuario = person.fazer_login(conn, conn_cursor, senha)
+    tipo_usuario = person.fazer_login(conn, conn_cursor, nome_usuario, senha)
 
     sleep(999)
 

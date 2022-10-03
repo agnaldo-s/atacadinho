@@ -36,7 +36,6 @@ def tabelas(conn, conn_cursor):
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             nome_usuario VARCHAR(60) NOT NULL,
             senha VARCHAR(60) NOT NULL,
-            perfil VARCHAR(13) NOT NULL,
             funcionario_id INTEGER NULL,
             CONSTRAINT fk_login_funcionario
                 FOREIGN KEY(funcionario_id)
@@ -98,6 +97,23 @@ def tabelas(conn, conn_cursor):
 
 
 def validar_login(conn, conn_cursor, nome_usuario, senha):
+    dados = [nome_usuario, senha]
+
     dql = """
-        SELECT 
+    SELECT f.id, nome, descricao
+    FROM pessoas p
+    INNER JOIN funcionarios f 
+	    ON p.id = f.pessoa_id
+    INNER JOIN tiposFuncionarios tf 
+	    ON f.tipoFunc_id = tf.id_tipoFunc
+    INNER JOIN logins l
+	    ON l.funcionario_id = f.id
+	    AND (l.nome_usuario = ? and l.senha = ?);
     """
+
+    with conn:
+        conn_cursor.execute(dql, dados)
+        dados_usuario = conn_cursor.fetchone()
+
+    for i in dados_usuario:
+        print(i)
