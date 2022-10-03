@@ -37,13 +37,7 @@ def tabelas(conn, conn_cursor):
             nome_usuario VARCHAR(60) NOT NULL,
             senha VARCHAR(60) NOT NULL,
             perfil VARCHAR(13) NOT NULL,
-            administrador_id INTEGER NULL,
             funcionario_id INTEGER NULL,
-            CONSTRAINT fk_login_administrador
-                FOREIGN KEY(administrador_id)
-                REFERENCES administradores(id)
-                ON UPDATE CASCADE
-                ON DELETE CASCADE,
             CONSTRAINT fk_login_funcionario
                 FOREIGN KEY(funcionario_id)
                 REFERENCES funcionarios(id)
@@ -74,20 +68,22 @@ def tabelas(conn, conn_cursor):
                 ON DELETE CASCADE
         );
     
-        CREATE TABLE IF NOT EXISTS regitro_movimentacao(
-            id_regMovitacao INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
+        CREATE TABLE IF NOT EXISTS registro_movimentacao(
+            id_registro_movimentacao INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS estoque(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             produto_id INTEGER NOT NULL,
             quantidade INTEGER NOT NULL,
-            id_regMovitacao INTEGER NOT NULL,
+            id_registro_movimentacao INTEGER NOT NULL,
             data_hora DATETIME default current_timestamp,
             id_funcionario INTERGER NOT NULL,
             CONSTRAINT fk_estoque_registro_movimentacao
-                FOREIGN KEY(id_regMovitacao)
-                REFERENCES regitro_movimentacao(id_regMovitacao),
+                FOREIGN KEY(id_registro_movimentacao)
+                REFERENCES registro_movimentacao(id_registro_movimentacao)
+                ON UPDATE CASCADE
+                ON DELETE CASCADE,
             CONSTRAINT fk_estoque_funcionarios
                 FOREIGN KEY(id_funcionario)
                 REFERENCES funcionarios(id)
@@ -95,7 +91,13 @@ def tabelas(conn, conn_cursor):
                 FOREIGN KEY(produto_id)
                 REFERENCES produtos(id)
         );
+    """
+
+    with conn:
+        conn_cursor.executescript(ddl)
 
 
-
+def validar_login(conn, conn_cursor, nome_usuario, senha):
+    dql = """
+        SELECT 
     """
