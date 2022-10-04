@@ -6,7 +6,7 @@ from abc import abstractmethod, ABC
 class Pessoa:
     @staticmethod
     def fazer_login(conn, conn_cursor, username, senha):
-        database.validar_login(conn, conn_cursor, username, senha)
+        return database.validar_login(conn, conn_cursor, username, senha)
 
     @staticmethod
     def sair_conta():
@@ -58,11 +58,17 @@ class Administrador(Pessoa):
 
 
 class Funcionario(Pessoa):
-    def __init__(self, id_pessoa, nome):
-        pass
+    def __init__(self, id, nome):
+        self.__id = id
+        self.__nome = nome
 
-    def fazer_login(self, username, senha):
-        pass
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def nome(self):
+        return self.__nome
 
     def sair_conta(self):
         pass

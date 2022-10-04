@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import database
-from classes import Pessoa
+from classes import *
 from time import sleep
 
 conexao_banco = sqlite3.connect('atacadinho.db')
@@ -53,12 +53,24 @@ def login(conn, conn_cursor, person):
     tipo_usuario = person.fazer_login(conn, conn_cursor, nome_usuario, senha)
 
     if tipo_usuario is None:
-        print('\nNome de usuário ou senha incorretos, informe novamente')
-    elif tipo_usuario[2] == 'Administrador':
-        pass
-    elif tipo_usuario[1] == 'Funcionario':
-        pass
+        print('\nNome de Usuário ou senha incorretos. Informe novamente!')
+    elif tipo_usuario[2] == 1:
+        admin = Administrador(tipo_usuario[0], tipo_usuario[1])
+        area_admin(admin)
+    elif tipo_usuario[2] == 2:
+        func = Funcionario(tipo_usuario[0], tipo_usuario[1])
+        area_funcionario(func)
 
+
+def area_admin(admin):
+    header1('ADMIN')
+    print(admin.__dict__)
+    sleep(999)
+
+
+def area_funcionario(funcionario):
+    header1('FUNCIONÁRIO')
+    print(funcionario.__dict__)
     sleep(999)
 
 

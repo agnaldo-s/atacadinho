@@ -99,16 +99,14 @@ def tabelas(conn, conn_cursor):
 def validar_login(conn, conn_cursor, nome_usuario, senha):
     dados = [nome_usuario, senha]
 
-    dql = """
-        SELECT f.id, nome, descricao
-        FROM pessoas p
-        INNER JOIN funcionarios f 
-	        ON p.id = f.pessoa_id
-        INNER JOIN tiposFuncionarios tf 
-	        ON f.tipoFunc_id = tf.id_tipoFunc
+    dql = f"""
+        SELECT f.id, p.nome, f.tipoFunc_id
+        FROM funcionarios f
+        INNER JOIN pessoas p 
+            ON p.id = f.pessoa_id
         INNER JOIN logins l
-	        ON l.funcionario_id = f.id
-	        AND (l.nome_usuario = ? and l.senha = ?);
+            ON l.funcionario_id = f.id 
+            AND (l.nome_usuario = ? AND l.senha = ?);
     """
 
     with conn:
