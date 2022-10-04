@@ -64,6 +64,18 @@ def login(conn, conn_cursor, person):
 
 def area_admin(admin):
     header1('ADMIN')
+
+    opcoes_conta = input(f"""
+            Olá, {admin.nome}!
+            O que deseja?
+            [1] - Consultar Usuários
+            [2] - Cadastrar Usuários
+            [3] - Atualizar Usuários
+            [4] - Deletar Usuários
+            [5] - Ir para o Estoque
+
+            [6] - Sair
+            >> """)
     print(admin.__dict__)
     sleep(999)
 
