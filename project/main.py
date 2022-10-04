@@ -64,6 +64,8 @@ def login(conn, conn_cursor, person):
 
 def area_admin(admin):
     header1('ADMIN')
+
+    opcoes_conta
     print(admin.__dict__)
     sleep(999)
 
