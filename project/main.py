@@ -1,14 +1,11 @@
 import os
 import sqlite3
-import database
 from classes import *
 from time import sleep
 
 conexao_banco = sqlite3.connect('atacadinho.db')
 conexao_banco.execute('PRAGMA foreign_keys=on')
 cursor = conexao_banco.cursor()
-
-pessoa = Pessoa()
 
 
 def header1(msg):
@@ -21,7 +18,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def main(conn, conn_cursor, person):
+def main(conn, conn_cursor):
     while True:
         header1('MENU PRINCIPAL')
 
@@ -32,7 +29,7 @@ def main(conn, conn_cursor, person):
 
         match menu_principal:
             case '1':
-                login(conn, conn_cursor, person)
+                login(conn, conn_cursor)
             case '2':
                 print('\nVolte sempre!!!')
                 sleep(1)
@@ -43,55 +40,40 @@ def main(conn, conn_cursor, person):
                 clear()
 
 
-def login(conn, conn_cursor, person):
+def login(conn, conn_cursor):
     header1('LOGIN')
 
-    nome_usuario = input('\nNome de Usuário: ')
+    while True:
+        tipo_usuario = Pessoa.fazer_login(conn, conn_cursor)
 
-    senha = input('\nSenha: ')
-
-    tipo_usuario = person.fazer_login(conn, conn_cursor, nome_usuario, senha)
-
-    if tipo_usuario is None:
-        print('\nNome de Usuário ou senha incorretos. Informe novamente!')
-    elif tipo_usuario[2] == 1:
-        admin = Administrador(tipo_usuario[0], tipo_usuario[1])
-        area_admin(admin)
-    elif tipo_usuario[2] == 2:
-        func = Funcionario(tipo_usuario[0], tipo_usuario[1])
-        area_funcionario(func)
+        if tipo_usuario is None:
+            print('\nNome de Usuário ou senha incorretos. Informe novamente!')
+        elif tipo_usuario[2] == 1:
+            area_admin(Administrador(tipo_usuario[0], tipo_usuario[1]))
+        elif tipo_usuario[2] == 2:
+            area_funcionario(Funcionario(tipo_usuario[0], tipo_usuario[1]))
 
 
 def area_admin(admin):
     header1('ADMIN')
 
-    opcoes_admin = input(f"""
-            Olá, {admin.nome}!
-            O que deseja?
-            [1] - Consultar Usuários
-            [2] - Cadastrar Usuários
-            [3] - Atualizar Usuários
-            [4] - Deletar Usuários
-            [5] - Ir para o Estoque
-
-            [6] - Sair
-            >> """)
-    print(admin.__dict__)
-    sleep(999)
+    opcoes_admin = input(f"Olá, {admin.nome}!"
+                         "\nO que deseja fazer?\n"
+                         "\n[1] - Consultar Usuários"
+                         "\n[2] - Cadastrar Usuários"
+                         "\n[3] - Atualizar Usuários"
+                         "\n[4] - Deletar Usuários"
+                         "\n\n[5] - Sair\n\n>> ")
 
 
 def area_funcionario(funcionario):
     header1('FUNCIONÁRIO')
-    opcoes_funcionario = input(f"""
-        Olá, {funcionario.nome}!
-        O que deseja?
-        [1] - Vender
 
-        [2] - Sair
-        >> """)
-    print(funcionario.__dict__)
-    sleep(999)
+    opcoes_funcionario = input(f"Olá, {funcionario.nome}!"
+                               "\nO que deseja fazer?\n"
+                               "\n[1] - Venda"
+                               "\n\n[2] - Sair\n\n>> ")
 
 
 database.tabelas(conexao_banco, cursor)
-main(conexao_banco, cursor, pessoa)
+main(conexao_banco, cursor)
