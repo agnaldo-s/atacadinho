@@ -1,11 +1,14 @@
-import sqlite3
 import database
 from abc import abstractmethod, ABC
 
 
 class Pessoa:
     @staticmethod
-    def fazer_login(conn, conn_cursor, username, senha):
+    def fazer_login(conn, conn_cursor):
+        username = input('\nNome de usuário: ')
+
+        senha = input('\nSenha: ')
+
         return database.validar_login(conn, conn_cursor, username, senha)
 
     @staticmethod
@@ -58,8 +61,8 @@ class Administrador(Pessoa):
 
 
 class Funcionario(Pessoa):
-    def __init__(self, id, nome):
-        self.__id = id
+    def __init__(self, id_funcionario, nome):
+        self.__id = id_funcionario
         self.__nome = nome
 
     @property
