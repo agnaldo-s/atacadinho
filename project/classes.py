@@ -2,7 +2,6 @@ import sqlite3
 import database
 from abc import abstractmethod, ABC
 
-
 conn = sqlite3.connect('atacadinho.db')
 cursor = conn.cursor()
 cursor.execute("PRAGMA foreign_keys = on")
@@ -28,7 +27,6 @@ class Pessoa:
 
         with conn:
             cursor.execute(dql, [username, senha])
-
 
         return cursor.fetchone()
 
