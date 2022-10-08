@@ -1,11 +1,12 @@
 import sqlite3
-import database
+from tabulate import  tabulate
 from abc import abstractmethod, ABC
+
 
 class BancoDeDados:
     @staticmethod
-    def criar(self):
-        conn = sqlite3.connect('/home/agnaldo/Documentos/jovemProgramador/ProjetoIntegrador/project/atacadinho.db')
+    def criar_tabelas():
+        conn = sqlite3.connect('atacadinho.db')
         conn.execute('PRAGMA foreign_keys=on')
         conn_cursor = conn.cursor()
         ddl = """
@@ -100,14 +101,16 @@ class BancoDeDados:
             );
         """
 
-        with conn:
-            conn_cursor.executescript(ddl)
+        conn_cursor.executescript(ddl)
 
+        conn.close()
 
-    def validar_login(conn, conn_cursor, nome_usuario, senha):
-        dados = [nome_usuario, senha]
+    @staticmethod
+    def validar_login(nome_usuario, senha):
+        conn = sqlite3.connect('atacadinho.db')
+        conn_cursor = conn.cursor()
 
-        dql = f"""
+        dql = """
             SELECT f.id, p.nome, f.tipoFunc_id
             FROM funcionarios f
             INNER JOIN pessoas p 
@@ -117,17 +120,47 @@ class BancoDeDados:
                 AND (l.nome_usuario = ? AND l.senha = ?);
         """
 
-        with conn:
-            conn_cursor.execute(dql, dados)
-            dados_usuario = conn_cursor.fetchone()
+        conn_cursor.execute(dql, [nome_usuario, senha])
+        dados_usuario = conn_cursor.fetchone()
+        conn.close()
 
         return dados_usuario
+
+    @staticmethod
+    def consultar_usuarios():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT f.id , p.nome, tf.descricao 
+	        FROM funcionarios f 
+		        INNER JOIN pessoas p 
+			        ON p.id = f.id 
+		        INNER JOIN tiposFuncionarios tf
+			        ON f.tipoFunc_id = tf.id_tipoFunc;
+        """
+
+        cursor.execute(dql)
+
+        usuarios = cursor.fetchall()
+
+        conn.close()
+
+        print(tabulate(
+            usuarios, headers=["ID", "NOME", "TIPO FUNCIONÁRIO"],
+            tablefmt="fancy_grid"
+                       ))
 
 
 class Pessoa:
     @staticmethod
-    def fazer_login(conn, conn_cursor, username, senha):
-        return database.validar_login(conn, conn_cursor, username, senha)
+    def fazer_login():
+        nome_usuario = input('\nNome de Usuário: ')
+        senha = input('\nSenha: ')
+
+        user = BancoDeDados.validar_login(nome_usuario, senha)
+
+        return user
 
     @staticmethod
     def sair_conta():
@@ -138,6 +171,7 @@ class Administrador(Pessoa):
     def __init__(self, id_admin, nome):
         self.__id = id_admin
         self.__nome = nome
+        self.banco = None
 
     @property
     def id(self):
@@ -147,29 +181,27 @@ class Administrador(Pessoa):
     def nome(self):
         return self.__nome
 
-    def consultar_administradores(self,tipo):
-        self.tipo = tipo
-        query=f"""  
+    def consultar_administradores():
+        query = f"""  
                 SELECT pessoas.nome
                 FROM pessoas
                 INNER JOIN funcionarios
                 ON funcionarios.id=pessoas.id
-                WHERE funcionarios.tipoFunc_id = {tipo};   
-                """        
+                WHERE funcionarios.tipoFunc_id = ?;   
+                """
         with conn:
             cursor.execute(query)
             data = cursor.fetchall()
             return data
 
-
     def consultar_funcionarios(self):
-        query="""  
+        query = """  
                 SELECT pessoas.nome
                 FROM pessoas
                 INNER JOIN funcionarios
                 ON funcionarios.id=pessoas.id
                 WHERE funcionarios.tipoFunc_id = 0;   
-                """               
+                """
 
     def cadastrar_administradores(self):
         pass
@@ -188,7 +220,6 @@ class Administrador(Pessoa):
 
     def deletar_funcionarios(self):
         pass
-
 
 
 class Funcionario(Pessoa):

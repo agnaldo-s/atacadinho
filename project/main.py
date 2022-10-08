@@ -50,6 +50,7 @@ def login():
 
 
 def area_admin(admin):
+    admin.banco = BancoDeDados()
     header1('ADMIN')
 
     opcoes_admin = input(f"Olá, {admin.nome}!"
@@ -59,6 +60,11 @@ def area_admin(admin):
                          "\n[3] - Atualizar Usuários"
                          "\n[4] - Deletar Usuários"
                          "\n\n[5] - Sair\n\n>> ")
+
+    match opcoes_admin:
+        case '1':
+            admin.banco.consultar_usuarios()
+            sleep(999)
 
 
 def area_funcionario(funcionario):
@@ -70,4 +76,5 @@ def area_funcionario(funcionario):
                                "\n\n[2] - Sair\n\n>> ")
 
 
+BancoDeDados.criar_tabelas()
 main()
