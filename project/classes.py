@@ -1,15 +1,34 @@
+import sqlite3
 import database
 from abc import abstractmethod, ABC
+
+conn = sqlite3.connect('atacadinho.db')
+cursor = conn.cursor()
+cursor.execute("PRAGMA foreign_keys = on")
+cursor.executescript(database.tabelas)
 
 
 class Pessoa:
     @staticmethod
-    def fazer_login(conn, conn_cursor):
+    def fazer_login():
         username = input('\nNome de usuário: ')
 
         senha = input('\nSenha: ')
 
-        return database.validar_login(conn, conn_cursor, username, senha)
+        dql = """
+            SELECT f.id, p.nome, f.tipoFunc_id
+            FROM funcionarios f
+            INNER JOIN pessoas p
+                ON p.id = f.pessoa_id
+            INNER JOIN logins l
+                ON l.funcionario_id = f.id
+                AND (l.nome_usuario = ? AND l.senha = ?)
+        """
+
+        with conn:
+            cursor.execute(dql, [username, senha])
+
+        return cursor.fetchone()
 
     @staticmethod
     def sair_conta():

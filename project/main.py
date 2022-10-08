@@ -1,11 +1,6 @@
 import os
-import sqlite3
 from classes import *
 from time import sleep
-
-conexao_banco = sqlite3.connect('atacadinho.db')
-conexao_banco.execute('PRAGMA foreign_keys=on')
-cursor = conexao_banco.cursor()
 
 
 def header1(msg):
@@ -18,7 +13,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def main(conn, conn_cursor):
+def main():
     while True:
         header1('MENU PRINCIPAL')
 
@@ -29,7 +24,7 @@ def main(conn, conn_cursor):
 
         match menu_principal:
             case '1':
-                login(conn, conn_cursor)
+                login()
             case '2':
                 print('\nVolte sempre!!!')
                 sleep(1)
@@ -40,11 +35,11 @@ def main(conn, conn_cursor):
                 clear()
 
 
-def login(conn, conn_cursor):
+def login():
     header1('LOGIN')
 
     while True:
-        tipo_usuario = Pessoa.fazer_login(conn, conn_cursor)
+        tipo_usuario = Pessoa.fazer_login()
 
         if tipo_usuario is None:
             print('\nNome de Usuário ou senha incorretos. Informe novamente!')
@@ -75,5 +70,4 @@ def area_funcionario(funcionario):
                                "\n\n[2] - Sair\n\n>> ")
 
 
-database.tabelas(conexao_banco, cursor)
-main(conexao_banco, cursor)
+main()
