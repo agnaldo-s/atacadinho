@@ -68,15 +68,26 @@ def area_admin(admin):
                 admin.cadastrar_usuarios()
             case '3':
                 admin.atualizar_usuarios()
+            case '4':
+                admin.deletar_usuarios()
+            case _:
+                print('\nInválido! Informe novamente!')
 
 
 def area_funcionario(funcionario):
     header1('FUNCIONÁRIO')
 
-    opcoes_funcionario = input(f"Olá, {funcionario.nome}!"
-                               "\nO que deseja fazer?\n"
-                               "\n[1] - Venda"
-                               "\n\n[2] - Sair\n\n>> ")
+    while True:
+        opcoes_funcionario = input(f"Olá, {funcionario.nome}!"
+                                   "\nO que deseja fazer?\n"
+                                   "\n[1] - Venda"
+                                   "\n\n[2] - Sair\n\n>> ")
+
+        match opcoes_funcionario:
+            case '1':
+                pass
+            case _:
+                print('\nInválido! Informe novamente!')
 
 
 BancoDeDados.criar_tabelas()

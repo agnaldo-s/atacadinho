@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 from tabulate import tabulate
 from abc import abstractmethod, ABC
@@ -215,6 +216,104 @@ class BancoDeDados:
 
         return tipos_funcionarios
 
+    @staticmethod
+    def return_id_pessoa_funcionario(id_funcionario):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql_id_table_pessoa_funcionario = """
+            SELECT p.id, f.id
+            FROM pessoas p
+                INNER JOIN funcionarios f
+                    ON p.id = f.pessoa_id
+                    WHERE f.id = ?
+        """
+
+        cursor.execute(dql_id_table_pessoa_funcionario, [id_funcionario])
+        id_pessoa = cursor.fetchone()
+
+        conn.close()
+
+        return id_pessoa
+
+    @staticmethod
+    def atualizar_telefone(id_funcionario, novo_valor):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        id_pessoa = BancoDeDados.return_id_pessoa_funcionario(id_funcionario)
+
+        dml = """
+            UPDATE pessoas
+            SET telefone = ?
+            WHERE id = ?
+        """
+
+        cursor.execute(dml, [novo_valor, id_pessoa])
+        conn.commit()
+        conn.close()
+
+        print('\nTelefone do usuário atualizado!')
+
+    @staticmethod
+    def atualizar_email(id_funcionario, novo_valor):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        id_pessoa = BancoDeDados.return_id_pessoa_funcionario(id_funcionario)
+
+        dml = """
+            UPDATE pessoas
+            SET email = ?
+            WHERE id = ?
+        """
+
+        cursor.execute(dml, [novo_valor, id_pessoa])
+        conn.commit()
+
+        conn.close()
+
+        print('\nEmail do usuário atualizado')
+
+    @staticmethod
+    def atualizar_nome_de_usuario_e_senha(id_funcionario, novos_valores):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dml = """
+            UPDATE logins
+            SET nome_usuario = ?, senha = ?
+            WHERE funcionario_id = ?
+        """
+
+        nome_usuario, senha = novos_valores
+
+        cursor.execute(dml, [nome_usuario, senha, id_funcionario])
+        conn.commit()
+        conn.close()
+
+        print('\nNome de usuário e senha atualizados!')
+
+    @staticmethod
+    def deletar_usuarios(id_pessoa):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        print(id_pessoa)
+        time.sleep(999)
+
+        dml = """
+            DELETE FROM pessoas
+            WHERE id = ?
+        """
+
+        cursor.execute(dml, [id_pessoa])
+        conn.commit()
+
+        conn.close()
+
+        print('\nUsuário Deletado com sucesso!')
+
 
 class Pessoa:
     @staticmethod
@@ -271,26 +370,54 @@ class Administrador(Pessoa):
         BancoDeDados.cadastrar_usuarios(self.id_admin, nome, cpf, data_nascimento, telefone, email, tipo_usuario,
                                         nome_usuario, senha)
 
-    def atualizar_usuarios(self):
+    @staticmethod
+    def atualizar_usuarios():
         BancoDeDados.consultar_usuarios()
 
-        try:
-            funcionario_id_update = int(input('\nQual funcionário deseja atualizar? '))
-        except ValueError:
-            print('\nInforme corretamente!!!')
+        while True:
+            try:
+                funcionario_id_update = int(input('\nQual funcionário deseja atualizar? '))
+            except ValueError:
+                print('\nInforme corretamente!!!')
+            finally:
+                break
 
+        while True:
+            informacoes_atualizar = input('\nQual informação deseja atualizar desse funcionário? '
+                                          '\n[1] - Telefone'
+                                          '\n[2] - Email'
+                                          '\n[3] - Nome de Usuário e Senha')
 
+            match informacoes_atualizar:
+                case '1':
+                    novo_telefone = input('\nNovo valor do telefone: ')
+                    BancoDeDados.atualizar_telefone(funcionario_id_update, novo_telefone)
+                case '2':
+                    novo_email = input('\nNovo valor do email: ')
+                    BancoDeDados.atualizar_email(funcionario_id_update, novo_email)
+                case '3':
+                    novo_username = input('\nNovo Nome de usuário: ')
+                    nova_senha = input('\nNova senha: ')
+                    BancoDeDados.atualizar_nome_de_usuario_e_senha(
+                        funcionario_id_update, [novo_username, nova_senha]
+                    )
+                case _:
+                    print('\nInválido! Informe novamente!')
 
-    def deletar_administradores(self):
-        pass
+    @staticmethod
+    def deletar_usuarios():
+        BancoDeDados.consultar_usuarios()
 
-    def deletar_funcionarios(self):
-        pass
+        id_funcionario = int(input('\nQual funcionário deseja deletar? '))
+
+        id_pessoa = BancoDeDados.return_id_pessoa_funcionario(id_funcionario)
+
+        BancoDeDados.deletar_usuarios(id_pessoa)
 
 
 class Funcionario(Pessoa):
-    def __init__(self, id, nome):
-        self.__id = id
+    def __init__(self, id_funcionario, nome):
+        self.__id = id_funcionario
         self.__nome = nome
 
     @property
