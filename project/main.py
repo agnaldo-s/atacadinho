@@ -106,6 +106,7 @@ def area_estoque(admin):
         match opcoes_estoque:
             case '1':
                 admin.estoque.consultar_produtos()
+                input('\nAperte ENTER para sair')
             case '2':
                 while True:
                     admin.adicionar_produtos()
