@@ -401,7 +401,7 @@ class BancoDeDados:
             WHERE id = ?
         """
 
-        cursor.execute(dml, [id_produto, novo_valor])
+        cursor.execute(dml, [novo_valor, id_produto])
 
         conn.commit()
         conn.close()
