@@ -83,13 +83,14 @@ class BancoDeDados:
                 id_registro_movimentacao INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
             );
 
-            CREATE TABLE IF NOT EXISTS estoque(
+            CREATE TABLE IF NOT EXISTS movimentacao(
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 produto_id INTEGER NOT NULL,
                 quantidade INTEGER NOT NULL,
                 id_registro_movimentacao INTEGER NOT NULL,
-                data_hora DATETIME default current_timestamp,
+                data_hora DATETIME DEFAULT current_timestamp,
                 id_funcionario INTERGER NOT NULL,
+                vlr_unitario DECIMAL(10,2),
                 CONSTRAINT fk_estoque_registro_movimentacao
                     FOREIGN KEY(id_registro_movimentacao)
                     REFERENCES registro_movimentacao(id_registro_movimentacao)
@@ -334,6 +335,7 @@ class Administrador(Pessoa):
         self.__nome = nome
         self.banco = None
         self.estoque = None
+        self.produtos = []
 
     @property
     def id_admin(self):
@@ -413,6 +415,17 @@ class Administrador(Pessoa):
 
         BancoDeDados.deletar_usuarios(id_pessoa[0])
 
+    def adicionar_produtos(self):
+        nome = input('\nNome produto: ')
+        valor_unitario = float(input('Valor unitário: '))
+        func_id = self.id_admin
+        categoria_id = int(input(''))
+        self.produtos.append(Produto(nome, valor_unitario, func_id, categoria_id))
+
+    def listar_produtos(self):
+        for produto in self.produtos:
+            print(produto.__dict__)
+
 
 class Funcionario(Pessoa):
     def __init__(self, id_funcionario, nome):
@@ -431,20 +444,16 @@ class Funcionario(Pessoa):
         pass
 
 
-class Movimentacao(ABC):
-    @abstractmethod
+class Movimentacao:
     def deletar_produto(self):
         pass
 
-    @abstractmethod
     def inserir_produto(self):
         pass
 
-    @abstractmethod
     def alterar_produto(self):
         pass
 
-    @abstractmethod
     def consultar_produto(self):
         pass
 
@@ -466,46 +475,23 @@ class Venda(Movimentacao):
         pass
 
 
-class Estoque():
-    def __int__(self):
-        self.__produtos = []
+class Produto:
+    def __init__(self, nome, valor_unitario, id_funcionario, categoria_id):
+        self.nome = nome
+        self.valor_unitario = valor_unitario
+        self.id_funcionario = id_funcionario
+        self.categoria_id = categoria_id
 
-    @property
-    def produtos(self):
-        return self.__produtos
 
+class Estoque:
     def deletar_produto(self):
         pass
 
-    def inserir_produto(self, nome, valor_unitario, id_funcionario, categoria_id):
-        self.__produtos.append(Produto())
+    def inserir_produtos(self, id_func):
+        pass
 
     def alterar_produto(self):
         pass
 
     def consultar_produtos(self):
         pass
-
-
-class Produto:
-    def __int__(self, nome, valor_unitario, id_funcionario, categoria_id):
-        self.__nome = nome
-        self.__valor_unitario = valor_unitario
-        self.__id_funcionario = id_funcionario
-        self.__categoria_id = categoria_id
-
-    @property
-    def nome(self):
-        return self.__nome
-
-    @property
-    def valor_unitario(self):
-        return self.__valor_unitario
-
-    @property
-    def id_funcionario(self):
-        return self.__id_funcionario
-
-    @property
-    def categoria_id(self):
-        return self.__categoria_id
