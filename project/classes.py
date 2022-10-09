@@ -138,7 +138,7 @@ class BancoDeDados:
             SELECT f.id , p.nome, tf.descricao 
 	        FROM funcionarios f 
 		        INNER JOIN pessoas p 
-			        ON p.id = f.id 
+			        ON p.id = f.pessoa_id 
 		        INNER JOIN tiposFuncionarios tf
 			        ON f.tipoFunc_id = tf.id_tipoFunc;
         """
@@ -299,9 +299,6 @@ class BancoDeDados:
         conn = sqlite3.connect('atacadinho.db')
         cursor = conn.cursor()
 
-        print(id_pessoa)
-        time.sleep(999)
-
         dml = """
             DELETE FROM pessoas
             WHERE id = ?
@@ -412,7 +409,7 @@ class Administrador(Pessoa):
 
         id_pessoa = BancoDeDados.return_id_pessoa_funcionario(id_funcionario)
 
-        BancoDeDados.deletar_usuarios(id_pessoa)
+        BancoDeDados.deletar_usuarios(id_pessoa[0])
 
 
 class Funcionario(Pessoa):
