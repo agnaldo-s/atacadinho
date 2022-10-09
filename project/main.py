@@ -64,7 +64,8 @@ def area_admin(admin):
     match opcoes_admin:
         case '1':
             admin.banco.consultar_usuarios()
-            sleep(999)
+        case '2':
+            admin.cadastrar_usuarios()
 
 
 def area_funcionario(funcionario):
