@@ -359,8 +359,6 @@ class BancoDeDados:
                 produtos[produto].categoria_id
             ]
 
-            print(dados_produto)
-
             dml = """
                 INSERT INTO produtos(nome, valor_unitario, funcionarios_id, categoria_id)
                 VALUES(?, ?, ?, ?)
@@ -372,6 +370,57 @@ class BancoDeDados:
         conn.close()
 
         print('\nProdutos adicionados com sucesso!!!')
+
+    @staticmethod
+    def consultar_produtos():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT p.id, p.nome, p.valor_unitario, c.descricao 
+            FROM produtos p
+                INNER JOIN categorias c 
+                	ON p.categoria_id = c.id ;	
+        """
+
+        cursor.execute(dql)
+        produtos = cursor.fetchall()
+        conn.close()
+
+        return produtos
+
+    @staticmethod
+    def update_nome_produto(id_produto, novo_valor):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+        cursor.execute('PRAGMA foreign_keys=on')
+
+        dml = """
+            UPDATE produtos
+            SET nome = ?
+            WHERE id = ?
+        """
+
+        cursor.execute(dml, [id_produto, novo_valor])
+
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def update_valor_unitario_produto(id_produto, novo_valor):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+        cursor.execute('PRAGMA foreign_keys=on')
+
+        dml = """
+            UPDATE produtos
+            SET valor_unitario = ?
+            WHERE id = ?
+        """
+
+        cursor.execute(dml, [id_produto, novo_valor])
+        conn.commit()
+        conn.close()
 
 
 class Pessoa:
@@ -562,8 +611,33 @@ class Estoque:
     def inserir_produtos(produtos):
         BancoDeDados.inserir_produtos(produtos)
 
-    def alterar_produto(self):
-        pass
+    @staticmethod
+    def alterar_produto():
+        print(tabulate(BancoDeDados.consultar_produtos(),
+                       headers=["ID", "PRODUTO", "VALOR_UNITARIO", "CATEGORIA"],
+                       tablefmt="fancy_grid"
+                       ))
 
-    def consultar_produtos(self):
-        pass
+        coluna_atualizar = input("\nQual coluna deseja atualizar?:"
+                                 "\n[1] - Nome do produto"
+                                 "\n[2] - Valor do produto"
+                                 "\n\n[3] - Sair\n\n>> ")
+
+        id_produto = int(input("\nInforme o id do produto para escolher ele: "))
+
+        match coluna_atualizar:
+            case '1':
+                novo_nome = input('\nNovo nome do produto')
+                BancoDeDados.update_nome_produto(id_produto, novo_nome)
+            case '2':
+                pass
+            case '3':
+                pass
+
+    @staticmethod
+    def consultar_produtos():
+        print(tabulate(
+            BancoDeDados.consultar_produtos(),
+            headers=["PRODUTO", "VALOR UNITÁRIO", "CATEGORIA"],
+            tablefmt="fancy_grid"
+        ))
