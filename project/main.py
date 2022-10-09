@@ -53,19 +53,21 @@ def area_admin(admin):
     admin.banco = BancoDeDados()
     header1('ADMIN')
 
-    opcoes_admin = input(f"Olá, {admin.nome}!"
-                         "\nO que deseja fazer?\n"
-                         "\n[1] - Consultar Usuários"
-                         "\n[2] - Cadastrar Usuários"
-                         "\n[3] - Atualizar Usuários"
-                         "\n[4] - Deletar Usuários"
-                         "\n\n[5] - Sair\n\n>> ")
-
-    match opcoes_admin:
-        case '1':
-            admin.banco.consultar_usuarios()
-        case '2':
-            admin.cadastrar_usuarios()
+    while True:
+        opcoes_admin = input(f"Olá, {admin.nome}!"
+                             "\nO que deseja fazer?\n"
+                             "\n[1] - Consultar Usuários"
+                             "\n[2] - Cadastrar Usuários"
+                             "\n[3] - Atualizar Usuários"
+                             "\n[4] - Deletar Usuários"
+                             "\n\n[5] - Sair\n\n>> ")
+        match opcoes_admin:
+            case '1':
+                admin.banco.consultar_usuarios()
+            case '2':
+                admin.cadastrar_usuarios()
+            case '3':
+                admin.atualizar_usuarios()
 
 
 def area_funcionario(funcionario):

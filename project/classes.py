@@ -1,5 +1,5 @@
 import sqlite3
-import time
+from datetime import date
 
 from tabulate import tabulate
 from abc import abstractmethod, ABC
@@ -169,7 +169,7 @@ class BancoDeDados:
         """
         dml_table_funcionarios = """
             INSERT INTO funcionarios(dt_cadastro, pessoa_id, tipoFunc_id, id_register)
-            VALUES(?, ?, ?, ?);
+            VALUES(date('now'), ?, ?, ?);
         """
         dql_max_funcionario = """
             SELECT MAX(id) FROM funcionarios;
@@ -184,21 +184,22 @@ class BancoDeDados:
         ])
 
         cursor.execute(dql_max_pessoa)
-        last_pessoa = cursor.fetchone()
+        last_pessoa = cursor.fetchone()[0]
 
         cursor.execute(dml_table_funcionarios, [
-            '2002-10-12', last_pessoa, tipo, id_funcionario
+            last_pessoa, tipo, id_funcionario
         ])
 
         cursor.execute(dql_max_funcionario)
-        last_funcionario = cursor.fetchone()
+        last_funcionario = cursor.fetchone()[0]
 
         cursor.execute(dml_table_logins, [
             nome_usuario, senha, last_funcionario
         ])
 
-        print(f'Usuário inserido com sucesso!!!')
+        conn.commit()
 
+        print(f'Usuário inserido com sucesso!!!')
 
     @staticmethod
     def tipos_usuarios():
