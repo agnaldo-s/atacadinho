@@ -105,7 +105,8 @@ def area_estoque(admin):
         case '1':
             admin.estoque.consultar_produtos()
         case '2':
-            admin.estoque.inserir_produto()
+            admin.adicionar_produtos()
+            admin.listar_produtos()
         case '3':
             admin.estoque.alterar_produto()
         case _:
