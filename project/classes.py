@@ -313,6 +313,66 @@ class BancoDeDados:
 
         print('\nUsuário Deletado com sucesso!')
 
+    @staticmethod
+    def return_categorias():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT * 
+            FROM categorias
+        """
+
+        cursor.execute(dql)
+        categorias = cursor.fetchall()
+        conn.close()
+
+        return categorias
+
+    @staticmethod
+    def adicionar_categoria(nome_categoria):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dml = """
+            INSERT INTO categorias(descricao)
+            VALUES(?)
+        """
+
+        cursor.execute(dml, [nome_categoria])
+        conn.commit()
+        conn.close()
+
+        print('\nCategoria Adicionada com sucesso!')
+
+    @staticmethod
+    def inserir_produtos(produtos):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+        conn.execute('PRAGMA foreign_keys=on;')
+
+        for produto in range(len(produtos)):
+            dados_produto = [
+                produtos[produto].nome,
+                produtos[produto].valor_unitario,
+                produtos[produto].id_funcionario,
+                produtos[produto].categoria_id
+            ]
+
+            print(dados_produto)
+
+            dml = """
+                INSERT INTO produtos(nome, valor_unitario, funcionarios_id, categoria_id)
+                VALUES(?, ?, ?, ?)
+            """
+
+            cursor.execute(dml, dados_produto)
+
+        conn.commit()
+        conn.close()
+
+        print('\nProdutos adicionados com sucesso!!!')
+
 
 class Pessoa:
     @staticmethod
@@ -419,12 +479,19 @@ class Administrador(Pessoa):
         nome = input('\nNome produto: ')
         valor_unitario = float(input('Valor unitário: '))
         func_id = self.id_admin
-        categoria_id = int(input(''))
+        print(tabulate(BancoDeDados.return_categorias(), headers=["ID", "CATEGORIA"], tablefmt="fancy_grid"))
+        categoria_id = int(input('Informe o id da categoria: '))
         self.produtos.append(Produto(nome, valor_unitario, func_id, categoria_id))
 
     def listar_produtos(self):
         for produto in self.produtos:
             print(produto.__dict__)
+
+    @staticmethod
+    def adicionar_categoria():
+        nome_categoria = input('Informe uma categoria para adicionar: ')
+
+        BancoDeDados.adicionar_categoria(nome_categoria)
 
 
 class Funcionario(Pessoa):
@@ -444,16 +511,20 @@ class Funcionario(Pessoa):
         pass
 
 
-class Movimentacao:
+class Movimentacao(ABC):
+    @abstractmethod
     def deletar_produto(self):
         pass
 
+    @abstractmethod
     def inserir_produto(self):
         pass
 
+    @abstractmethod
     def alterar_produto(self):
         pass
 
+    @abstractmethod
     def consultar_produto(self):
         pass
 
@@ -487,8 +558,9 @@ class Estoque:
     def deletar_produto(self):
         pass
 
-    def inserir_produtos(self, id_func):
-        pass
+    @staticmethod
+    def inserir_produtos(produtos):
+        BancoDeDados.inserir_produtos(produtos)
 
     def alterar_produto(self):
         pass

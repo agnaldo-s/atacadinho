@@ -60,7 +60,7 @@ def area_admin(admin):
                              "\n[2] - Cadastrar Usuários"
                              "\n[3] - Atualizar Usuários"
                              "\n[4] - Deletar Usuários"
-                             "\n[5] - Usar Estoque"
+                             "\n\n[5] - Usar Estoque"
                              "\n\n[6] - Sair\n\n>> ")
         match opcoes_admin:
             case '1':
@@ -96,21 +96,45 @@ def area_funcionario(funcionario):
 def area_estoque(admin):
     admin.estoque = Estoque()
 
-    opcoes_estoque = input('\nO que deseja fazer?\n'
-                           '\n[1] - Consultar produtos'
-                           '\n[2] - Inserir produtos'
-                           '\n[3] - Atualizar produtos')
+    while True:
+        opcoes_estoque = input('\nO que deseja fazer?\n'
+                               '\n[1] - Consultar produtos'
+                               '\n[2] - Inserir produtos'
+                               '\n[3] - Adicionar categoria'
+                               '\n[4] - Atualizar produtos\n\n>> ')
 
-    match opcoes_estoque:
-        case '1':
-            admin.estoque.consultar_produtos()
-        case '2':
-            admin.adicionar_produtos()
-            admin.listar_produtos()
-        case '3':
-            admin.estoque.alterar_produto()
-        case _:
-            print('\nInválido! Informe corretamente!')
+        match opcoes_estoque:
+            case '1':
+                admin.estoque.consultar_produtos()
+            case '2':
+                while True:
+                    admin.adicionar_produtos()
+                    print('\nSeus produtos: ')
+                    admin.listar_produtos()
+
+                    opcoes_produtos = input("O que deseja fazer?"
+                                            "\n[1] - Adicionar mais um produto"
+                                            "\n[2] - Cadastrar os produtos no sistema"
+                                            "\n\n[3] - Sair e apagar\n\n>> ")
+
+                    match opcoes_produtos:
+                        case '1':
+                            pass
+                        case '2':
+                            admin.estoque.inserir_produtos(admin.produtos)
+                            break
+                        case '3':
+                            admin.produtos.clear()
+                            break
+                        case _:
+                            print('Inválido! Informe novamente!')
+
+            case '3':
+                admin.adicionar_categoria()
+            case '4':
+                admin.estoque.alterar_produto()
+            case _:
+                print('\nInválido! Informe corretamente!')
 
 
 BancoDeDados.criar_tabelas()
