@@ -9,8 +9,8 @@ class BancoDeDados:
     @staticmethod
     def criar_tabelas():
         conn = sqlite3.connect('atacadinho.db')
-        conn.execute('PRAGMA foreign_keys=on')
         conn_cursor = conn.cursor()
+        conn_cursor.execute('PRAGMA foreign_keys=on')
         ddl = """
             CREATE TABLE IF NOT EXISTS pessoas(
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -30,16 +30,16 @@ class BancoDeDados:
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 dt_cadastro DATE NOT NULL,
                 pessoa_id INTEGER NOT NULL,
-                tipoFunc_id INTERGER NOT NULL,
+                tipoFunc_id INTEGER NOT NULL,
                 id_register INTEGER NULL,
-                CONSTRAINT fk_funcionario_tipoFuncionarios
-                    FOREIGN KEY(tipoFunc_id)
-                    REFERENCES tiposFuncionarios(id_tipoFunc)
-                    ON UPDATE CASCADE
-                    ON DELETE CASCADE,
                 CONSTRAINT fk_funcionario_pessoa
                     FOREIGN KEY(pessoa_id)
                     REFERENCES pessoas(id)
+                    ON UPDATE CASCADE
+                    ON DELETE CASCADE,
+                CONSTRAINT fk_funcionario_tipoFunc
+                    FOREIGN KEY(tipoFunc_id)
+                    REFERENCES tiposFuncionarios(id_tipoFunc)
                     ON UPDATE CASCADE
                     ON DELETE CASCADE
             );
@@ -298,6 +298,7 @@ class BancoDeDados:
     def deletar_usuarios(id_pessoa):
         conn = sqlite3.connect('atacadinho.db')
         cursor = conn.cursor()
+        cursor.execute('PRAGMA foreign_keys=on')
 
         dml = """
             DELETE FROM pessoas
