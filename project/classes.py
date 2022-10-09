@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import date
 
 from tabulate import tabulate
 from abc import abstractmethod, ABC
@@ -272,11 +271,15 @@ class Administrador(Pessoa):
         BancoDeDados.cadastrar_usuarios(self.id_admin, nome, cpf, data_nascimento, telefone, email, tipo_usuario,
                                         nome_usuario, senha)
 
-    def atualizar_administradores(self):
-        pass
+    def atualizar_usuarios(self):
+        BancoDeDados.consultar_usuarios()
 
-    def atualizar_funcionarios(self):
-        pass
+        try:
+            funcionario_id_update = int(input('\nQual funcionário deseja atualizar? '))
+        except ValueError:
+            print('\nInforme corretamente!!!')
+
+
 
     def deletar_administradores(self):
         pass
