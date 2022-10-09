@@ -1,5 +1,7 @@
 import sqlite3
-from tabulate import  tabulate
+import time
+
+from tabulate import tabulate
 from abc import abstractmethod, ABC
 
 
@@ -29,6 +31,7 @@ class BancoDeDados:
                 dt_cadastro DATE NOT NULL,
                 pessoa_id INTEGER NOT NULL,
                 tipoFunc_id INTERGER NOT NULL,
+                id_register INTEGER NULL,
                 CONSTRAINT fk_funcionario_tipoFuncionarios
                     FOREIGN KEY(tipoFunc_id)
                     REFERENCES tiposFuncionarios(id_tipoFunc)
@@ -147,9 +150,70 @@ class BancoDeDados:
         conn.close()
 
         print(tabulate(
-            usuarios, headers=["ID", "NOME", "TIPO FUNCIONÁRIO"],
+            usuarios,
+            headers=["ID", "NOME", "TIPO FUNCIONÁRIO"],
             tablefmt="fancy_grid"
-                       ))
+        ))
+
+    @staticmethod
+    def cadastrar_usuarios(id_funcionario, nome, cpf, dt_nasc, telefone, email, tipo, nome_usuario, senha):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dml_table_pesssoas = """
+            INSERT INTO pessoas(nome, cpf, dt_nasc, telefone, email)
+            VALUES(?, ?, ?, ?, ?);
+        """
+        dql_max_pessoa = """
+            SELECT MAX(id) FROM pessoas
+        """
+        dml_table_funcionarios = """
+            INSERT INTO funcionarios(dt_cadastro, pessoa_id, tipoFunc_id, id_register)
+            VALUES(?, ?, ?, ?);
+        """
+        dql_max_funcionario = """
+            SELECT MAX(id) FROM funcionarios;
+        """
+        dml_table_logins = """
+            INSERT INTO logins(nome_usuario, senha, funcionario_id)
+            VALUES(?, ?, ?);
+        """
+
+        cursor.execute(dml_table_pesssoas, [
+            nome, cpf, dt_nasc, telefone, email
+        ])
+
+        cursor.execute(dql_max_pessoa)
+        last_pessoa = cursor.fetchone()
+
+        cursor.execute(dml_table_funcionarios, [
+            '2002-10-12', last_pessoa, tipo, id_funcionario
+        ])
+
+        cursor.execute(dql_max_funcionario)
+        last_funcionario = cursor.fetchone()
+
+        cursor.execute(dml_table_logins, [
+            nome_usuario, senha, last_funcionario
+        ])
+
+        print(f'Usuário inserido com sucesso!!!')
+
+
+    @staticmethod
+    def tipos_usuarios():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT * FROM tiposFuncionarios
+        """
+
+        cursor.execute(dql)
+        tipos_funcionarios = cursor.fetchall()
+        conn.close()
+
+        return tipos_funcionarios
 
 
 class Pessoa:
@@ -169,45 +233,43 @@ class Pessoa:
 
 class Administrador(Pessoa):
     def __init__(self, id_admin, nome):
-        self.__id = id_admin
+        self.__id_admin = id_admin
         self.__nome = nome
         self.banco = None
 
     @property
-    def id(self):
-        return self.__id
+    def id_admin(self):
+        return self.__id_admin
 
     @property
     def nome(self):
         return self.__nome
 
-    def consultar_administradores():
-        query = f"""  
-                SELECT pessoas.nome
-                FROM pessoas
-                INNER JOIN funcionarios
-                ON funcionarios.id=pessoas.id
-                WHERE funcionarios.tipoFunc_id = ?;   
-                """
-        with conn:
-            cursor.execute(query)
-            data = cursor.fetchall()
-            return data
+    def cadastrar_usuarios(self):
+        nome = input('\nNome: ')
 
-    def consultar_funcionarios(self):
-        query = """  
-                SELECT pessoas.nome
-                FROM pessoas
-                INNER JOIN funcionarios
-                ON funcionarios.id=pessoas.id
-                WHERE funcionarios.tipoFunc_id = 0;   
-                """
+        cpf = input('\nCPF: ')
 
-    def cadastrar_administradores(self):
-        pass
+        data_nascimento = input('\nData de Nascimento: ')
 
-    def cadastrar_funcionarios(self):
-        pass
+        telefone = input('\nTelefone')
+
+        email = input('\nEmail: ')
+
+        print(tabulate(
+            BancoDeDados.tipos_usuarios(),
+            headers=["TIPO FUNCIONÁRIO"],
+            tablefmt="fancy_grid"
+        ))
+
+        tipo_usuario = input('\nTipo de usuário: ')
+
+        nome_usuario = input('\nNome_usuario: ')
+
+        senha = input('\nSenha')
+
+        BancoDeDados.cadastrar_usuarios(self.id_admin, nome, cpf, data_nascimento, telefone, email, tipo_usuario,
+                                        nome_usuario, senha)
 
     def atualizar_administradores(self):
         pass
