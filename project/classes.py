@@ -333,6 +333,7 @@ class Administrador(Pessoa):
         self.__id_admin = id_admin
         self.__nome = nome
         self.banco = None
+        self.estoque = None
 
     @property
     def id_admin(self):
@@ -465,15 +466,46 @@ class Venda(Movimentacao):
         pass
 
 
-class Estoque(Movimentacao):
+class Estoque():
+    def __int__(self):
+        self.__produtos = []
+
+    @property
+    def produtos(self):
+        return self.__produtos
+
     def deletar_produto(self):
         pass
 
-    def inserir_produto(self):
-        pass
+    def inserir_produto(self, nome, valor_unitario, id_funcionario, categoria_id):
+        self.__produtos.append(Produto())
 
     def alterar_produto(self):
         pass
 
-    def consultar_produto(self):
+    def consultar_produtos(self):
         pass
+
+
+class Produto:
+    def __int__(self, nome, valor_unitario, id_funcionario, categoria_id):
+        self.__nome = nome
+        self.__valor_unitario = valor_unitario
+        self.__id_funcionario = id_funcionario
+        self.__categoria_id = categoria_id
+
+    @property
+    def nome(self):
+        return self.__nome
+
+    @property
+    def valor_unitario(self):
+        return self.__valor_unitario
+
+    @property
+    def id_funcionario(self):
+        return self.__id_funcionario
+
+    @property
+    def categoria_id(self):
+        return self.__categoria_id

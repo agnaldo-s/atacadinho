@@ -60,7 +60,8 @@ def area_admin(admin):
                              "\n[2] - Cadastrar Usuários"
                              "\n[3] - Atualizar Usuários"
                              "\n[4] - Deletar Usuários"
-                             "\n\n[5] - Sair\n\n>> ")
+                             "\n[5] - Usar Estoque"
+                             "\n\n[6] - Sair\n\n>> ")
         match opcoes_admin:
             case '1':
                 admin.banco.consultar_usuarios()
@@ -70,6 +71,8 @@ def area_admin(admin):
                 admin.atualizar_usuarios()
             case '4':
                 admin.deletar_usuarios()
+            case '5':
+                area_estoque(admin)
             case _:
                 print('\nInválido! Informe novamente!')
 
@@ -88,6 +91,25 @@ def area_funcionario(funcionario):
                 pass
             case _:
                 print('\nInválido! Informe novamente!')
+
+
+def area_estoque(admin):
+    admin.estoque = Estoque()
+
+    opcoes_estoque = input('\nO que deseja fazer?\n'
+                           '\n[1] - Consultar produtos'
+                           '\n[2] - Inserir produtos'
+                           '\n[3] - Atualizar produtos')
+
+    match opcoes_estoque:
+        case '1':
+            admin.estoque.consultar_produtos()
+        case '2':
+            admin.estoque.inserir_produto()
+        case '3':
+            admin.estoque.alterar_produto()
+        case _:
+            print('\nInválido! Informe corretamente!')
 
 
 BancoDeDados.criar_tabelas()
