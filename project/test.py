@@ -8,15 +8,21 @@
 from datetime import datetime, date
 import re
 
-a = [(1,), (2,)]
+from tabulate import tabulate
 
-b = int(input('number: '))
+print(tabulate(
+    [
+        ["Nome", "Diego"],
+        ["CPF", "123.123.123-12"],
+        ["Data de Nascimento", "17-10-2002"],
+        ["Telefone", "91988505828"],
+        ["Email", "diego@gmail.com"],
+        ["Tipo Usuário", "Admin"],
+        ["Nome de Usuário", "reis"],
+        ["Senha", "123456"]
+    ], headers=["Coluna", "Dados"], tablefmt="psql"
+))
 
-for i in a:
-    for j in i:
-        if b == j:
-            print('tem id')
-        else:
-            print('nao tem id')
+a = 'ana paula'
 
-
+print(a.replace(' ', '').isalpha())

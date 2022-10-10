@@ -224,10 +224,33 @@ class BancoDeDados:
         """
 
         cursor.execute(dql)
-        ids = cursor.fetchall()
+        ids_tuple = cursor.fetchall()
         conn.close()
 
+        ids = []
+
+        for tup in ids_tuple:
+            for id_tipo_func in tup:
+                ids.append(id_tipo_func)
+
         return ids
+
+    @staticmethod
+    def validar_nome_usuario(nome_usuario):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT nome_usuario 
+            FROM logins
+            WHERE nome_usuario = ?;
+        """
+
+        cursor.execute(dql, [nome_usuario])
+        dado_nome_usuario = cursor.fetchone()
+        conn.close()
+
+        return True if dado_nome_usuario is None else False
 
     @staticmethod
     def consultar_usuarios():
@@ -593,6 +616,9 @@ class Administrador(Pessoa):
             if len(nome) < 3:
                 print('\nInforme um nome!!!')
                 sleep(1)
+            elif not nome.replace(' ', '').isalpha():
+                print('\nInforme um nome válido!')
+                sleep(1)
             else:
                 break
 
@@ -633,25 +659,91 @@ class Administrador(Pessoa):
 
         id_tipos_funcionarios = BancoDeDados.return_id_tipoFuncionarios()
 
-        print(id_tipos_funcionarios)
-        sleep(999)
-
         while True:
+            clear()
             print(tabulate(
                 BancoDeDados.tipos_usuarios(),
-                headers=["TIPO FUNCIONÁRIO"],
+                headers=["ID", "TIPO FUNCIONÁRIO"],
                 tablefmt="fancy_grid"
             ))
 
-            tipo_usuario = input('\nTipo de usuário: ')
-            break
+            tipo_usuario = input('\nTipo de usuário(id): ')
 
-        nome_usuario = input('\nNome_usuario: ')
+            if not tipo_usuario.isdecimal():
+                print('\nInforme um número válido!')
+                sleep(1)
+            elif int(tipo_usuario) in id_tipos_funcionarios:
+                tipo_usuario = int(tipo_usuario)
+                break
+            else:
+                print('\nInforme um id válido!')
+                sleep(1)
 
-        senha = input('\nSenha')
+        while True:
+            nome_usuario = input('\nNome_usuario: ')
 
-        BancoDeDados.cadastrar_usuarios(self.id_admin, nome, cpf, data_nascimento, telefone, email, tipo_usuario,
-                                        nome_usuario, senha)
+            if len(nome_usuario) < 4:
+                print('\nInforme um nome de usuário maior!')
+            elif not BancoDeDados.validar_nome_usuario(nome_usuario):
+                print('\nEsse nome de usuário ja existe! Informe um novo!')
+            else:
+                break
+
+        while True:
+            senha = mask_password()
+
+            if len(senha) < 6:
+                print('\nInforme uma senha maior! 6 caracteres ou mais!')
+            else:
+                break
+
+        tipo_usuario_extenso = ""
+
+        if tipo_usuario == 1:
+            tipo_usuario_extenso = 'Admin'
+        elif tipo_usuario == 2:
+            tipo_usuario_extenso = 'Funcionario'
+
+        while True:
+            clear()
+            print(tabulate(
+                [
+                    ["Nome", f"{nome}"],
+                    ["CPF", f"{cpf}"],
+                    ["Data de Nascimento", f"{data_nascimento}"],
+                    ["Telefone", f"{telefone}"],
+                    ["Email", f"{email}"],
+                    ["Tipo Usuário", f"{tipo_usuario_extenso}"],
+                    ["Nome de Usuário", f"{nome_usuario}"],
+                    ["Senha", f"{senha}"]
+                ], headers=["Coluna", "Dados"], tablefmt="psql"
+            ))
+
+            opcao_confirmar_cadastro = input("\nO que deseja fazer?\n"
+                                             "\n[1] - Confirmar cadastro"
+                                             "\n[2] - Apagar e refazer cadastro"
+                                             "\n[3] - Apagar e sair do cadastro"
+                                             "\n\n>> ")
+
+            match opcao_confirmar_cadastro:
+                case '1':
+                    BancoDeDados.cadastrar_usuarios(
+                        self.id_admin, nome, cpf,
+                        data_nascimento, telefone, email,
+                        tipo_usuario, nome_usuario, senha
+                    )
+                    print('\nUsuário cadastrado com sucesso!')
+                    sleep(1)
+                    break
+                case '2':
+                    return self.cadastrar_usuarios()
+                case '3':
+                    print('\nSaindo do cadastro...')
+                    sleep(1)
+                    break
+                case _:
+                    print('\nInválido! Informe novamente!')
+                    sleep(1)
 
     @staticmethod
     def atualizar_usuarios():
