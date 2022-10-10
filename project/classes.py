@@ -1071,7 +1071,19 @@ class Venda(Movimentacao):
         ))
 
     def gerar_nota_fiscal(self):
-        pass
+        total = 0
+
+        for j in self.produtos_para_vender:
+            total += j[0].valor_unitario * j[1]
+
+        cupom = []
+
+        for i in self.produtos_para_vender:
+            cupom.append([i[0].nome, i[0].valor_unitario, i[1]])
+
+        print(tabulate([["CUPOM FISCAL"]], tablefmt="fancy_grid"))
+        print(tabulate(cupom, tablefmt="fancy_grid"))
+        print(tabulate([[f"TOTAL: R${total}"]], tablefmt="fancy_grid"))
 
 
 class Produto:

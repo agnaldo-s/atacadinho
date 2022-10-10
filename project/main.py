@@ -124,7 +124,8 @@ def area_venda(funcionario):
                 funcionario.funcao.consultar_produto()
                 input('\nAperte ENTER para sair')
             case '4':
-                pass
+                funcionario.funcao.gerar_nota_fiscal()
+                input('\nAperte ENTER para sair')
             case '5':
                 break
             case _:
