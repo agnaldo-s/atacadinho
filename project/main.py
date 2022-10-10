@@ -122,6 +122,11 @@ def area_venda(funcionario):
                 pass
             case '3':
                 funcionario.funcao.consultar_produto()
+                input('\nAperte ENTER para sair')
+            case '4':
+                pass
+            case '5':
+                break
             case _:
                 print('\nInválido! Informe novamente')
 
@@ -137,13 +142,13 @@ def area_estoque(admin):
                                '\n[2] - Inserir produtos'
                                '\n[3] - Adicionar categoria'
                                '\n[4] - Atualizar produtos'
-                               '\n\n[5] - Sair'
+                               '\n[5] - Entrada de produtos'
+                               '\n\n[6] - Sair'
                                '\n\n>> ')
 
         match opcoes_estoque:
             case '1':
-                if admin.estoque.consultar_produtos() is None:
-                    print('\nNão tem produtos cadastrados ainda!')
+                admin.estoque.consultar_produtos()
                 input('\nAperte ENTER para sair')
             case '2':
                 if BancoDeDados.return_categorias() == []:
@@ -178,6 +183,8 @@ def area_estoque(admin):
             case '4':
                 admin.estoque.alterar_produto()
             case '5':
+                admin.estoque.entrada_produto(admin.id_admin)
+            case '6':
                 break
             case _:
                 print('\nInválido! Informe corretamente!')
