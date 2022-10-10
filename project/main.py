@@ -74,6 +74,9 @@ def area_admin(admin):
                 admin.deletar_usuarios()
             case '5':
                 area_estoque(admin)
+            case '6':
+                if admin.sair_conta():
+                    return main()
             case _:
                 print('\nInválido! Informe novamente!')
 
@@ -108,6 +111,7 @@ def area_venda(funcionario):
         match opcoes_venda:
             case '1':
                 funcionario.funcao.inserir_produto()
+                break
             case '2':
                 pass
             case '3':
@@ -124,7 +128,9 @@ def area_estoque(admin):
                                '\n[1] - Consultar produtos'
                                '\n[2] - Inserir produtos'
                                '\n[3] - Adicionar categoria'
-                               '\n[4] - Atualizar produtos\n\n>> ')
+                               '\n[4] - Atualizar produtos'
+                               '\n\n[5] - Sair'
+                               '\n\n>> ')
 
         match opcoes_estoque:
             case '1':
@@ -157,6 +163,8 @@ def area_estoque(admin):
                 admin.adicionar_categoria()
             case '4':
                 admin.estoque.alterar_produto()
+            case '5':
+                break
             case _:
                 print('\nInválido! Informe corretamente!')
 

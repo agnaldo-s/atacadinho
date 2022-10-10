@@ -454,7 +454,7 @@ class Pessoa:
 
     @staticmethod
     def sair_conta():
-        pass
+        return True
 
 
 class Administrador(Pessoa):
@@ -606,7 +606,7 @@ class Venda(Movimentacao):
         self.produtos_para_vender = []
 
     def deletar_produto(self):
-        pass
+        Venda.consultar_produto()
 
     def inserir_produto(self):
         print(tabulate(
