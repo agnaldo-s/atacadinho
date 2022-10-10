@@ -1,6 +1,8 @@
+import re
 import sqlite3
-import time
-
+from useful import *
+from time import sleep
+from datetime import datetime, date
 from tabulate import tabulate
 from abc import abstractmethod, ABC
 
@@ -129,6 +131,103 @@ class BancoDeDados:
         conn.close()
 
         return dados_usuario
+
+    @staticmethod
+    def validar_cpf(cpf):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        validadores = [False, False]
+
+        dql = """
+            SELECT cpf 
+            FROM pessoas
+            WHERE cpf = ?
+        """
+
+        cursor.execute(dql, [cpf])
+        cpf_encontrado = cursor.fetchone()
+        conn.close()
+
+        if cpf_encontrado is None:
+            validadores[0] = True
+
+        if re.match(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$', cpf):
+            validadores[1] = True
+
+        if False in validadores:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def validar_telefone(telefone):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        validadores = [False, False]
+
+        dql = """
+            SELECT telefone 
+            FROM pessoas
+            WHERE telefone = ?
+        """
+
+        cursor.execute(dql, [telefone])
+        dado_telefone = cursor.fetchone()
+        conn.close()
+
+        if dado_telefone is None:
+            validadores[0] = True
+
+        if re.match(r'^\d{2}9[0-9]{8}$', telefone):
+            validadores[1] = True
+
+        if False in validadores:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def validar_email(email):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        validadores = [False, False]
+
+        dql = """
+            SELECT email
+            FROM pessoas
+            WHERE email = ?;
+        """
+
+        cursor.execute(dql, [email])
+        dado_email = cursor.fetchone()
+        conn.close()
+
+        if dado_email is None:
+            validadores[0] = True
+
+        if re.fullmatch(r'^[a-zA-Z0-9]+[._]?[a-zA-Z0-9]*@[a-zA-Z]+\.[a-z]{3}$', email):
+            validadores[1] = True
+
+        return False if False in validadores else True
+
+    @staticmethod
+    def return_id_tipoFuncionarios():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT id_tipoFunc
+            FROM tiposFuncionarios;
+        """
+
+        cursor.execute(dql)
+        ids = cursor.fetchall()
+        conn.close()
+
+        return ids
 
     @staticmethod
     def consultar_usuarios():
@@ -446,7 +545,7 @@ class Pessoa:
     @staticmethod
     def fazer_login():
         nome_usuario = input('\nNome de Usuário: ')
-        senha = input('\nSenha: ')
+        senha = mask_password()
 
         user = BancoDeDados.validar_login(nome_usuario, senha)
 
@@ -473,24 +572,79 @@ class Administrador(Pessoa):
     def nome(self):
         return self.__nome
 
+    @staticmethod
+    def validar_data(data):
+        try:
+            datetime.strptime(data, '%d-%m-%Y')
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
+    def validar_idade(data):
+        return False if date.today().year - int(data[6:]) < 18 else True
+
     def cadastrar_usuarios(self):
-        nome = input('\nNome: ')
+        clear()
+        header1('CADASTRO USUÁRIO')
+        while True:
+            nome = input('\nNome: ').title()
 
-        cpf = input('\nCPF: ')
+            if len(nome) < 3:
+                print('\nInforme um nome!!!')
+                sleep(1)
+            else:
+                break
 
-        data_nascimento = input('\nData de Nascimento: ')
+        while True:
+            cpf = input('\nCPF: ')
 
-        telefone = input('\nTelefone')
+            if BancoDeDados.validar_cpf(cpf):
+                break
+            else:
+                print('\nInforme um cpf válido!')
 
-        email = input('\nEmail: ')
+        while True:
+            data_nascimento = input('\nData de Nascimento: ')
 
-        print(tabulate(
-            BancoDeDados.tipos_usuarios(),
-            headers=["TIPO FUNCIONÁRIO"],
-            tablefmt="fancy_grid"
-        ))
+            if Administrador.validar_data(data_nascimento):
+                if Administrador.validar_idade(data_nascimento):
+                    break
+                else:
+                    print('Não pode cadastrar uma pessoa com menos de 18 anos.')
+            else:
+                print('\nInforme uma data válida!')
 
-        tipo_usuario = input('\nTipo de usuário: ')
+        while True:
+            telefone = input('\nTelefone: ')
+
+            if BancoDeDados.validar_telefone(telefone):
+                break
+            else:
+                print('\nTelefone Inválido!')
+
+        while True:
+            email = input('\nEmail: ')
+
+            if BancoDeDados.validar_email(email):
+                break
+            else:
+                print('\nEmail inválido! Informe novamente!')
+
+        id_tipos_funcionarios = BancoDeDados.return_id_tipoFuncionarios()
+
+        print(id_tipos_funcionarios)
+        sleep(999)
+
+        while True:
+            print(tabulate(
+                BancoDeDados.tipos_usuarios(),
+                headers=["TIPO FUNCIONÁRIO"],
+                tablefmt="fancy_grid"
+            ))
+
+            tipo_usuario = input('\nTipo de usuário: ')
+            break
 
         nome_usuario = input('\nNome_usuario: ')
 
@@ -613,7 +767,7 @@ class Venda(Movimentacao):
             BancoDeDados.consultar_produtos(),
             headers=["ID", "NOME", "VALOR UNITÁRIO", "DESCRICAO"],
             tablefmt="fancy_grid"
-                       ))
+        ))
 
         id_produto = int(input('\nInforme o id do produto para adicionar: '))
 
