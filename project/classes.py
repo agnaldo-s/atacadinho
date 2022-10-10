@@ -250,7 +250,7 @@ class BancoDeDados:
             WHERE id = ?
         """
 
-        cursor.execute(dml, [novo_valor, id_pessoa])
+        cursor.execute(dml, [novo_valor, id_pessoa[0]])
         conn.commit()
         conn.close()
 
@@ -269,7 +269,7 @@ class BancoDeDados:
             WHERE id = ?
         """
 
-        cursor.execute(dml, [novo_valor, id_pessoa])
+        cursor.execute(dml, [novo_valor, id_pessoa[0]])
         conn.commit()
 
         conn.close()
@@ -401,7 +401,7 @@ class BancoDeDados:
             WHERE id = ?
         """
 
-        cursor.execute(dml, [id_produto, novo_valor])
+        cursor.execute(dml, [novo_valor, id_produto])
 
         conn.commit()
         conn.close()
@@ -502,15 +502,18 @@ class Administrador(Pessoa):
                 case '1':
                     novo_telefone = input('\nNovo valor do telefone: ')
                     BancoDeDados.atualizar_telefone(funcionario_id_update, novo_telefone)
+                    break
                 case '2':
                     novo_email = input('\nNovo valor do email: ')
                     BancoDeDados.atualizar_email(funcionario_id_update, novo_email)
+                    break
                 case '3':
                     novo_username = input('\nNovo Nome de usuário: ')
                     nova_senha = input('\nNova senha: ')
                     BancoDeDados.atualizar_nome_de_usuario_e_senha(
                         funcionario_id_update, [novo_username, nova_senha]
                     )
+                    break
                 case _:
                     print('\nInválido! Informe novamente!')
 

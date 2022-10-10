@@ -65,6 +65,7 @@ def area_admin(admin):
         match opcoes_admin:
             case '1':
                 admin.banco.consultar_usuarios()
+                input('\nAperte ENTER para sair ')
             case '2':
                 admin.cadastrar_usuarios()
             case '3':
