@@ -422,6 +422,25 @@ class BancoDeDados:
         conn.commit()
         conn.close()
 
+    @staticmethod
+    def return_produto(id_produto):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT p.nome, p.valor_unitario, p.funcionarios_id, p.categoria_id
+            FROM produtos p
+            WHERE id = ?
+        """
+
+        cursor.execute(dql, [id_produto])
+
+        dados_produto = cursor.fetchone()
+
+        conn.close()
+
+        return dados_produto
+
 
 class Pessoa:
     @staticmethod
@@ -550,6 +569,7 @@ class Funcionario(Pessoa):
     def __init__(self, id_funcionario, nome):
         self.__id = id_funcionario
         self.__nome = nome
+        self.funcao = None
 
     @property
     def id(self):
@@ -582,17 +602,40 @@ class Movimentacao(ABC):
 
 
 class Venda(Movimentacao):
+    def __init__(self):
+        self.produtos_para_vender = []
+
     def deletar_produto(self):
         pass
 
     def inserir_produto(self):
-        pass
+        print(tabulate(
+            BancoDeDados.consultar_produtos(),
+            headers=["ID", "NOME", "VALOR UNITÁRIO", "DESCRICAO"],
+            tablefmt="fancy_grid"
+                       ))
+
+        id_produto = int(input('\nInforme o id do produto para adicionar: '))
+
+        nome, valor_unitario, funcionarios_id, categoria_id = BancoDeDados.return_produto(id_produto)
+
+        quantidade = int(input(f'Informe a quantidade do produto {nome}: '))
+
+        self.produtos_para_vender.append([Produto(nome, valor_unitario, funcionarios_id, categoria_id), quantidade])
+
+        print(f'Produto {nome} adicionado!')
 
     def alterar_produto(self):
         pass
 
     def consultar_produto(self):
-        pass
+        produtos = []
+        for produto in self.produtos_para_vender:
+            produtos.append([produto[0].nome, produto[0].valor_unitario, produto[1]])
+
+        print(tabulate(
+            produtos, headers=["PRODUTO", "VALOR UNITÁRIO", "QUANTIADE"], tablefmt="fancy_grid"
+        ))
 
     def gerar_nota_fiscal(self):
         pass
