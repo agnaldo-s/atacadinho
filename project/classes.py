@@ -236,6 +236,29 @@ class BancoDeDados:
         return ids
 
     @staticmethod
+    def return_id_funcionarios():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT id 
+            FROM funcionarios
+        """
+
+        cursor.execute(dql)
+        ids_funcionarios_tuple = cursor.fetchall()
+        conn.close()
+
+        func_ids = []
+
+        for tuple in ids_funcionarios_tuple:
+            for id in tuple:
+                func_ids.append(id)
+
+        return func_ids
+
+
+    @staticmethod
     def validar_nome_usuario(nome_usuario):
         conn = sqlite3.connect('atacadinho.db')
         cursor = conn.cursor()
@@ -747,34 +770,66 @@ class Administrador(Pessoa):
 
     @staticmethod
     def atualizar_usuarios():
+        clear()
+        header1('ATUALIZAR USUÁRIOS')
         BancoDeDados.consultar_usuarios()
+
+        funcionario_id_update = 0
 
         while True:
             try:
-                funcionario_id_update = int(input('\nQual funcionário deseja atualizar? '))
+                funcionario_id_update = int(input('\nQual funcionário deseja atualizar(id)? '))
+                if funcionario_id_update in BancoDeDados.return_id_funcionarios():
+                    break
+                else:
+                    print('\nO id informado não existe. Informe novamente!')
             except ValueError:
                 print('\nInforme corretamente!!!')
-            finally:
-                break
 
         while True:
             informacoes_atualizar = input('\nQual informação deseja atualizar desse funcionário? '
                                           '\n[1] - Telefone'
                                           '\n[2] - Email'
-                                          '\n[3] - Nome de Usuário e Senha')
+                                          '\n[3] - Nome de Usuário e Senha\n\n>> ')
 
             match informacoes_atualizar:
                 case '1':
-                    novo_telefone = input('\nNovo valor do telefone: ')
-                    BancoDeDados.atualizar_telefone(funcionario_id_update, novo_telefone)
+                    while True:
+                        novo_telefone = input('\nNovo valor do telefone: ')
+
+                        if BancoDeDados.validar_telefone(novo_telefone):
+                            BancoDeDados.atualizar_telefone(funcionario_id_update, novo_telefone)
+                            break
+                        else:
+                            print('\nTelefone Inválido! Informe novamente')
                     break
                 case '2':
-                    novo_email = input('\nNovo valor do email: ')
-                    BancoDeDados.atualizar_email(funcionario_id_update, novo_email)
+                    while True:
+                        novo_email = input('\nNovo valor do email: ')
+
+                        if BancoDeDados.validar_email(novo_email):
+                            BancoDeDados.atualizar_email(funcionario_id_update, novo_email)
+                            break
+                        else:
+                            print('\nEmail inválido! Informe novamente!')
                     break
                 case '3':
-                    novo_username = input('\nNovo Nome de usuário: ')
-                    nova_senha = input('\nNova senha: ')
+                    while True:
+                        novo_username = input('\nNovo Nome de usuário: ')
+
+                        if BancoDeDados.validar_nome_usuario(novo_username):
+                            break
+                        else:
+                            print('\nEsse nome de usuário já existe! Informe novamente outro.')
+
+                    while True:
+                        nova_senha = input('\nNova senha: ')
+
+                        if len(nova_senha) < 6:
+                            print('\nInforme uma senha maior(6 caracteres)')
+                        else:
+                            break
+
                     BancoDeDados.atualizar_nome_de_usuario_e_senha(
                         funcionario_id_update, [novo_username, nova_senha]
                     )
@@ -784,9 +839,17 @@ class Administrador(Pessoa):
 
     @staticmethod
     def deletar_usuarios():
+        clear()
+        header1('DELETAR USUÁRIOS')
         BancoDeDados.consultar_usuarios()
 
-        id_funcionario = int(input('\nQual funcionário deseja deletar? '))
+        while True:
+            id_funcionario = int(input('\nQual funcionário deseja deletar? '))
+
+            if id_funcionario in BancoDeDados.return_id_funcionarios():
+                break
+            else:
+                print('\nO id informado não existe! Informe novamente!')
 
         id_pessoa = BancoDeDados.return_id_pessoa_funcionario(id_funcionario)
 
@@ -852,7 +915,7 @@ class Venda(Movimentacao):
         self.produtos_para_vender = []
 
     def deletar_produto(self):
-        Venda.consultar_produto()
+        self.consultar_produto()
 
     def inserir_produto(self):
         print(tabulate(
