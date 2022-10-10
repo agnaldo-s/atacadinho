@@ -1,20 +1,11 @@
-import os
+from useful import *
 from classes import *
 from time import sleep
 
 
-def header1(msg):
-    print('=' * 50)
-    print(f'{msg:^50}')
-    print('=' * 50)
-
-
-def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-
 def main():
     while True:
+        clear()
         header1('MENU PRINCIPAL')
 
         menu_principal = input(
@@ -32,28 +23,34 @@ def main():
             case _:
                 print('\nINVÁLIDO!!!')
                 sleep(1)
-                clear()
 
 
 def login():
-    header1('LOGIN')
+    clear()
 
     while True:
+        header1('LOGIN')
         tipo_usuario = Pessoa.fazer_login()
 
         if tipo_usuario is None:
             print('\nNome de Usuário ou senha incorretos. Informe novamente!')
-        elif tipo_usuario[2] == 1:
-            area_admin(Administrador(tipo_usuario[0], tipo_usuario[1]))
-        elif tipo_usuario[2] == 2:
-            area_funcionario(Funcionario(tipo_usuario[0], tipo_usuario[1]))
+            sleep(1)
+            clear()
+        else:
+            print('\nLogin efetuado com sucesso!')
+            sleep(1)
+            if tipo_usuario[2] == 1:
+                area_admin(Administrador(tipo_usuario[0], tipo_usuario[1]))
+            elif tipo_usuario[2] == 2:
+                area_funcionario(Funcionario(tipo_usuario[0], tipo_usuario[1]))
 
 
 def area_admin(admin):
     admin.banco = BancoDeDados()
-    header1('ADMIN')
 
     while True:
+        clear()
+        header1('ADMIN')
         opcoes_admin = input(f"Olá, {admin.nome}!"
                              "\nO que deseja fazer?\n"
                              "\n[1] - Consultar Usuários"
@@ -64,6 +61,8 @@ def area_admin(admin):
                              "\n\n[6] - Sair\n\n>> ")
         match opcoes_admin:
             case '1':
+                clear()
+                header1('FUNCIONÁRIOS')
                 admin.banco.consultar_usuarios()
                 input('\nAperte ENTER para sair ')
             case '2':
@@ -79,6 +78,7 @@ def area_admin(admin):
                     return main()
             case _:
                 print('\nInválido! Informe novamente!')
+                sleep(1)
 
 
 def area_funcionario(funcionario):
@@ -104,14 +104,12 @@ def area_venda(funcionario):
                              '\n[1] - Inserir produto'
                              '\n[2] - Remover produto'
                              '\n[3] - Listar produtos'
-                             '\n[4] - Realizar venda'
-                             '\n[5] - '
-                             '\n\n[6] - Sair\n\n>> ')
+                             '\n[4] - Finalizar venda'
+                             '\n\n[5] - Sair\n\n>> ')
 
         match opcoes_venda:
             case '1':
                 funcionario.funcao.inserir_produto()
-                break
             case '2':
                 pass
             case '3':
@@ -124,6 +122,8 @@ def area_estoque(admin):
     admin.estoque = Estoque()
 
     while True:
+        clear()
+        header1('ESTOQUE')
         opcoes_estoque = input('\nO que deseja fazer?\n'
                                '\n[1] - Consultar produtos'
                                '\n[2] - Inserir produtos'
@@ -167,7 +167,9 @@ def area_estoque(admin):
                 break
             case _:
                 print('\nInválido! Informe corretamente!')
+                sleep(1)
 
 
+clear()
 BancoDeDados.criar_tabelas()
 main()
