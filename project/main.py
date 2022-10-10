@@ -82,9 +82,10 @@ def area_admin(admin):
 
 
 def area_funcionario(funcionario):
-    header1('FUNCIONÁRIO')
 
     while True:
+        clear()
+        header1('FUNCIONÁRIO')
         opcoes_funcionario = input(f"Olá, {funcionario.nome}!"
                                    "\nO que deseja fazer?\n"
                                    "\n[1] - Venda"
@@ -93,14 +94,21 @@ def area_funcionario(funcionario):
         match opcoes_funcionario:
             case '1':
                 area_venda(funcionario)
+            case '2':
+                if funcionario.sair_conta():
+                    return main()
             case _:
                 print('\nInválido! Informe novamente!')
 
 
 def area_venda(funcionario):
+
     funcionario.funcao = Venda()
+
     while True:
-        opcoes_venda = input('\nO que deseja fazer?'
+        clear()
+        header1('ÁREA VENDA')
+        opcoes_venda = input('\nO que deseja fazer?\n'
                              '\n[1] - Inserir produto'
                              '\n[2] - Remover produto'
                              '\n[3] - Listar produtos'

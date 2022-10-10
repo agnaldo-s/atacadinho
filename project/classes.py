@@ -943,7 +943,7 @@ class Funcionario(Pessoa):
         return self.__nome
 
     def sair_conta(self):
-        pass
+        return True
 
 
 class Movimentacao(ABC):
