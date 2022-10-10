@@ -5,24 +5,19 @@
 #     tablefmt="fancy_grid"
 # ))
 
-from datetime import datetime, date
-import re
 
-from tabulate import tabulate
+from classes import BancoDeDados
 
-print(tabulate(
-    [
-        ["Nome", "Diego"],
-        ["CPF", "123.123.123-12"],
-        ["Data de Nascimento", "17-10-2002"],
-        ["Telefone", "91988505828"],
-        ["Email", "diego@gmail.com"],
-        ["Tipo Usuário", "Admin"],
-        ["Nome de Usuário", "reis"],
-        ["Senha", "123456"]
-    ], headers=["Coluna", "Dados"], tablefmt="psql"
-))
+a = [(4, 'bebidas'), (9, 'salgados'), (11, 'doces')]
 
-a = 'ana paula'
+id_cat = int(input('id: '))
 
-print(a.replace(' ', '').isalpha())
+print(a)
+
+for i in a:
+    for j in i:
+        if id_cat == j:
+            print(i)
+
+
+

@@ -856,16 +856,70 @@ class Administrador(Pessoa):
         BancoDeDados.deletar_usuarios(id_pessoa[0])
 
     def adicionar_produtos(self):
-        nome = input('\nNome produto: ')
-        valor_unitario = float(input('Valor unitário: '))
+        valor_unitario = 0.0
+
+        while True:
+            nome = input('\nNome produto: ')
+
+            if len(nome) < 3:
+                print('\nInforme um nome válido!')
+            else:
+                break
+
+        while True:
+            try:
+                valor_unitario = float(input('Valor unitário: '))
+                break
+            except ValueError:
+                print('\nInforme um valor válido!')
+
         func_id = self.id_admin
-        print(tabulate(BancoDeDados.return_categorias(), headers=["ID", "CATEGORIA"], tablefmt="fancy_grid"))
-        categoria_id = int(input('Informe o id da categoria: '))
-        self.produtos.append(Produto(nome, valor_unitario, func_id, categoria_id))
+
+        categorias = BancoDeDados.return_categorias()
+
+        id_categorias = []
+
+        for categoria in categorias:
+            for id in categoria:
+                id_categorias.append(id)
+
+        while True:
+            clear()
+            print(tabulate(
+                categorias,
+                headers=["ID", "CATEGORIA"], 
+                tablefmt="fancy_grid")
+                )
+
+            id_categoria_escolher = input('\nInforme o id da categoria: ')
+
+            try:
+                int(id_categoria_escolher)
+            except ValueError:
+                print('\nInválido! Informe novamente!')
+                sleep(1)
+                continue
+
+            if int(id_categoria_escolher) in id_categorias:
+                break
+            else:
+                print('\nO id informado não existe. Informe novamente')
+                sleep(1)
+
+        self.produtos.append(Produto(nome, valor_unitario, func_id, id_categoria_escolher))
+
 
     def listar_produtos(self):
+        produtos = []
+
         for produto in self.produtos:
-            print(produto.__dict__)
+            produtos.append([produto.nome, produto.valor_unitario])
+
+        print(tabulate(
+            produtos, 
+            headers=["PRODUTO", "VALOR UNITÁRIO"],
+            tablefmt="fancy_grid"
+            ))
 
     @staticmethod
     def adicionar_categoria():
@@ -991,6 +1045,8 @@ class Estoque:
 
     @staticmethod
     def consultar_produtos():
+        clear()
+        header1('PRODUTOS')
         print(tabulate(
             BancoDeDados.consultar_produtos(),
             headers=["PRODUTO", "VALOR UNITÁRIO", "CATEGORIA"],
