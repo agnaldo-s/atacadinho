@@ -89,9 +89,31 @@ def area_funcionario(funcionario):
 
         match opcoes_funcionario:
             case '1':
-                pass
+                area_venda(funcionario)
             case _:
                 print('\nInválido! Informe novamente!')
+
+
+def area_venda(funcionario):
+    funcionario.funcao = Venda()
+    while True:
+        opcoes_venda = input('\nO que deseja fazer?'
+                             '\n[1] - Inserir produto'
+                             '\n[2] - Remover produto'
+                             '\n[3] - Listar produtos'
+                             '\n[4] - Realizar venda'
+                             '\n[5] - '
+                             '\n\n[6] - Sair\n\n>> ')
+
+        match opcoes_venda:
+            case '1':
+                funcionario.funcao.inserir_produto()
+            case '2':
+                pass
+            case '3':
+                funcionario.funcao.consultar_produto()
+            case _:
+                print('\nInválido! Informe novamente')
 
 
 def area_estoque(admin):
