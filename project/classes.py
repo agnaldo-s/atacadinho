@@ -257,6 +257,23 @@ class BancoDeDados:
 
         return func_ids
 
+    @staticmethod
+    def consultar_valor_produto(id_produto):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT valor_unitario
+            FROM produtos
+            WHERE id = ?
+        """
+
+        cursor.execute(dql, [id_produto])
+        valor_produto = cursor.fetchone()[0]
+        conn.close()
+
+        return valor_produto
+
 
     @staticmethod
     def validar_nome_usuario(nome_usuario):
@@ -533,6 +550,58 @@ class BancoDeDados:
         conn.close()
 
         return produtos
+
+    @staticmethod
+    def consultar_id_produtos():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+
+        dql = """
+            SELECT id FROM produtos;
+        """
+
+        cursor.execute(dql)
+        produtos = cursor.fetchall()
+        conn.close()
+
+        ids = []
+
+        for produto in produtos:
+            for id in produto:
+                ids.append(id)
+        
+        return ids
+    
+    def retornar_id_movimentacao():
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+        dql="""INSERT INTO registro_movimentacao(id_registro_movimentacao) VALUES (NULL);"""
+        dql1 = """
+            SELECT MAX(id_registro_movimentacao) FROM registro_movimentacao;
+        """
+
+        cursor.execute(dql)
+        conn.commit()
+        cursor.execute(dql1)
+        id = cursor.fetchone()[0]
+        conn.close()
+        return id
+
+    @staticmethod
+    def adicionar_movimentacao(produto_id, quantidade, id_registro_movimentacao,id_funcionario,vlr_unitario):
+        conn = sqlite3.connect('atacadinho.db')
+        cursor = conn.cursor()
+        dml = """
+                INSERT INTO movimentacao (produto_id, quantidade, id_registro_movimentacao,id_funcionario,vlr_unitario)
+                VALUES(?, ?, ?, ?, ?)
+            """
+
+        cursor.execute(dml,[produto_id, quantidade, id_registro_movimentacao,id_funcionario,vlr_unitario])
+
+        conn.commit()
+        conn.close()
+
+        print('\nMovimentação adicionada com sucesso!!!')
 
     @staticmethod
     def update_nome_produto(id_produto, novo_valor):
@@ -856,16 +925,71 @@ class Administrador(Pessoa):
         BancoDeDados.deletar_usuarios(id_pessoa[0])
 
     def adicionar_produtos(self):
-        nome = input('\nNome produto: ')
-        valor_unitario = float(input('Valor unitário: '))
+        valor_unitario = 0.0
+
+        while True:
+            nome = input('\nNome produto: ')
+
+            if len(nome) < 3:
+                print('\nInforme um nome válido!')
+            else:
+                break
+
+        while True:
+            try:
+                valor_unitario = float(input('Valor unitário: '))
+                break
+            except ValueError:
+                print('\nInforme um valor válido!')
+
+
         func_id = self.id_admin
-        print(tabulate(BancoDeDados.return_categorias(), headers=["ID", "CATEGORIA"], tablefmt="fancy_grid"))
-        categoria_id = int(input('Informe o id da categoria: '))
-        self.produtos.append(Produto(nome, valor_unitario, func_id, categoria_id))
+
+        categorias = BancoDeDados.return_categorias()
+
+        id_categorias = []
+
+        for categoria in categorias:
+            for id in categoria:
+                id_categorias.append(id)
+
+        while True:
+            clear()
+            print(tabulate(
+                categorias,
+                headers=["ID", "CATEGORIA"], 
+                tablefmt="fancy_grid")
+                )
+
+            id_categoria_escolher = input('\nInforme o id da categoria: ')
+
+            try:
+                int(id_categoria_escolher)
+            except ValueError:
+                print('\nInválido! Informe novamente!')
+                sleep(1)
+                continue
+
+            if int(id_categoria_escolher) in id_categorias:
+                break
+            else:
+                print('\nO id informado não existe. Informe novamente')
+                sleep(1)
+
+        self.produtos.append(Produto(nome, valor_unitario, func_id, id_categoria_escolher))
+
 
     def listar_produtos(self):
+        produtos = []
+
         for produto in self.produtos:
-            print(produto.__dict__)
+            produtos.append([produto.nome, produto.valor_unitario])
+
+        print(tabulate(
+            produtos, 
+            headers=["PRODUTO", "VALOR UNITÁRIO"],
+            tablefmt="fancy_grid"
+            ))
 
     @staticmethod
     def adicionar_categoria():
@@ -889,7 +1013,7 @@ class Funcionario(Pessoa):
         return self.__nome
 
     def sair_conta(self):
-        pass
+        return True
 
 
 class Movimentacao(ABC):
@@ -947,7 +1071,19 @@ class Venda(Movimentacao):
         ))
 
     def gerar_nota_fiscal(self):
-        pass
+        total = 0
+
+        for j in self.produtos_para_vender:
+            total += j[0].valor_unitario * j[1]
+
+        cupom = []
+
+        for i in self.produtos_para_vender:
+            cupom.append([i[0].nome, i[0].valor_unitario, i[1]])
+
+        print(tabulate([["CUPOM FISCAL"]], tablefmt="fancy_grid"))
+        print(tabulate(cupom, tablefmt="fancy_grid"))
+        print(tabulate([[f"TOTAL: R${total}"]], tablefmt="fancy_grid"))
 
 
 class Produto:
@@ -968,29 +1104,83 @@ class Estoque:
 
     @staticmethod
     def alterar_produto():
-        print(tabulate(BancoDeDados.consultar_produtos(),
-                       headers=["ID", "PRODUTO", "VALOR_UNITARIO", "CATEGORIA"],
-                       tablefmt="fancy_grid"
-                       ))
+        while True:
+            if BancoDeDados.consultar_produtos() == []:
+                print('\nNão existe produtos cadastrados ainda!')
+                sleep(1)
+                break
+            else:
+                header1('ATUALIZAR PRODUTO')
+                while True:
+                    print(tabulate(
+                        BancoDeDados.consultar_produtos(),
+                        headers=["ID", "PRODUTO", "VALOR UNITÁRIO", "CATEGORIA"],
+                        tablefmt="fancy_grid"
+                        ))
+                    coluna_atualizar = input("\nQual coluna deseja atualizar?:"
+                                             "\n[1] - Nome do produto"
+                                             "\n[2] - Valor do produto"
+                                             "\n\n[3] - Sair\n\n>> ")
 
-        coluna_atualizar = input("\nQual coluna deseja atualizar?:"
-                                 "\n[1] - Nome do produto"
-                                 "\n[2] - Valor do produto"
-                                 "\n\n[3] - Sair\n\n>> ")
+                    id_produto = int(input("\nInforme o id do produto para escolher ele: "))
 
-        id_produto = int(input("\nInforme o id do produto para escolher ele: "))
+                    match coluna_atualizar:
+                        case '1':
+                            novo_nome = input('\nNovo nome do produto')
+                            BancoDeDados.update_nome_produto(id_produto, novo_nome)
+                        case '2':
+                            pass
+                        case '3':
+                            pass
 
-        match coluna_atualizar:
-            case '1':
-                novo_nome = input('\nNovo nome do produto')
-                BancoDeDados.update_nome_produto(id_produto, novo_nome)
-            case '2':
-                pass
-            case '3':
-                pass
+    @staticmethod
+    def entrada_produto(admin):
+        while True:
+            try:
+                id_produto = int(input("\nInforme o id do produto: "))
+                if id_produto not in BancoDeDados.consultar_id_produtos():
+                    print("\nO id informado não existe! Informe novamente!")
+                else:
+                    break
+            except:
+                print("\n\nInforme um número inteiro!\n")
+
+        while True:
+            try:
+                quantidade = int(input("\nInforme a quantidade do produto: "))
+                if quantidade <= 0:
+                    print("\nA quantidade deve ser maior que 0! Informe novamente!")
+                else:
+                    break
+            except:
+                print("\n\nInforme um número inteiro!\n\n")
+        while True: 
+            att_valor = input("\nDeseja atualizar o valor do produto? [S/N]: ").upper()   
+            if att_valor not in ['S', 'N']:
+                print("\nOpção inválida! Informe novamente!")
+                sleep(2)
+            else:
+                break
+
+        if att_valor == 'S':         
+            while True:
+                valor = float(input("\nInforme o valor do produto: "))
+                if valor <= 0:
+                    print("\nO valor deve ser maior que 0! Informe novamente!")
+                    sleep(2)
+                else:
+                    break
+        elif att_valor == 'N':
+            valor = BancoDeDados.consultar_valor_produto(id_produto)
+
+        id_movimentacao= BancoDeDados.retornar_id_movimentacao()
+        BancoDeDados.adicionar_movimentacao(id_produto, quantidade,id_movimentacao, admin, valor) 
+        BancoDeDados.update_valor_unitario_produto(id_produto, valor)
 
     @staticmethod
     def consultar_produtos():
+        clear()
+        header1('PRODUTOS')
         print(tabulate(
             BancoDeDados.consultar_produtos(),
             headers=["PRODUTO", "VALOR UNITÁRIO", "CATEGORIA"],
